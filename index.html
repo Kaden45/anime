@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Read-Only Note</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .textbox {
+      width: 100%;
+      min-height: 250px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .textbox[readonly] {
+      cursor: default;
+      user-select: text;
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      justify-content: flex-end;
+    }
+
+    button {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    button.secondary:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1 id="title">View Mode</h1>
+    </div>
+    
+    <textarea id="textbox" class="textbox" placeholder="• My Hero Academia - S1-S8 + All Movies
+• Jujutsu Kaisen - S1-S3 + JJK 0
+• Tokyo Ghoul -  S1
+• Yandere Dark Elf - S1
+• A Silent Voice - Movie
+• Demon Slayer - S1-S4 + Infinity Castle (1/3)
+• Re:ZERO - S1-S4 Part 1
+• My Dress-Up Darling - S1-S2
+• Cyberpunk: Edgerunners - S1
+• Call of the Night - S1-S2
+• Don't Toy with Me, Miss Nagatoro - S1-S2
+• Blue Lock - S1-S2
+• Horimiya - S1
+• Kaguya-sama: Love Is War - S1-S3 + The First Kiss That Never Ends
+• Frieren: Beyond Journey’s End - S1-S2
+• Tsukigakirei - S1
+• Your Name - Movie
+• The Tunnel to Summer, the Exit of Goodbye - Movie"></textarea>
+
+    <div class="actions">
+      <button class="secondary" onclick="copyText()">Copy Text</button>
+      <button id="shareBtn" onclick="shareNote()">Get Read-Only Link</button>
+    </div>
+  </div>
+
+  <script>
+    const textbox = document.getElementById('textbox');
+    const title = document.getElementById('title');
+    const shareBtn = document.getElementById('shareBtn');
+
+    // Check if URL contains encoded text in the hash
+    if (window.location.hash.length > 1) {
+      try {
+        const decodedText = decodeURIComponent(atob(window.location.hash.substring(1)));
+        textbox.value = decodedText;
+        textbox.setAttribute('readonly', 'true');
+        title.innerText = 'Read-Only Note';
+        shareBtn.style.display = 'none';
+      } catch (e) {
+        console.error("Invalid URL hash content");
+      }
+    } else {
+      title.innerText = 'Creator Mode';
+      textbox.value = "Type your permanent message here, then click 'Get Read-Only Link'.";
+    }
+
+    function shareNote() {
+      const text = textbox.value.trim();
+      if (!text) return alert('Please enter some text first.');
+      
+      const encoded = btoa(encodeURIComponent(text));
+      const shareUrl = `${window.location.origin}${window.location.pathname}#${encoded}`;
+      
+      navigator.clipboard.writeText(shareUrl);
+      alert('Read-only link copied to clipboard! Anyone visiting that link will see non-editable text.');
+    }
+
+    function copyText() {
+      navigator.clipboard.writeText(textbox.value);
+      alert('Text copied to clipboard!');
+    }
+  </script>
+</body>
+</html>
